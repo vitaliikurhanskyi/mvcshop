@@ -34,6 +34,29 @@ class Cart
 	}
 
 	/**
+	* Удалить продукт из корзины
+	*/
+	public static function deleteProduct($id)
+	{
+		$id = intval($id);
+
+		// Пустой массив для товаров в корзине
+		$productsInCart = array();
+
+		// Если в корзине уже есть товары (они хранятся в сессии)
+		if (isset($_SESSION['products'])) {
+			// То заполним наш массив товарами
+			$productsInCart = $_SESSION['products'];
+		}
+
+		if (array_key_exists($id, $productsInCart)) {
+			unset($productsInCart[$id]);
+		}
+
+		$_SESSION['products'] = $productsInCart;
+	}
+
+	/**
 	* Подщет количества товаров в корзине (в сесии) 
 	*/
 	public static function countItems()
@@ -49,6 +72,44 @@ class Cart
 			return 0;
 		}
 
+	}
+
+	/**
+	* Получить массив продуктов из сессии
+	*/
+	public static function getProducts()
+	{
+		if (isset($_SESSION['products'])) {
+			return $_SESSION['products'];
+		}
+		return false;
+	}
+
+	/**
+	* Получить общую цену на продукты
+	*/
+	public static function getTotalPrice($products)
+	{
+		$productsInCart = self::getProducts();
+
+		if ($productsInCart) {
+			$total = 0;
+			foreach ($products as $item) {
+				$total += $item['price'] * $productsInCart[$item['id']];
+			}
+		}
+
+		return $total;
+	}
+
+	/**
+	* Очистить сессию корзины
+	*/
+	public static function clear()
+	{
+		if (isset($_SESSION['products'])) {
+			unset($_SESSION['products']);
+		}
 	}
 
 }
