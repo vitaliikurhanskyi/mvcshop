@@ -98,7 +98,7 @@ class CartController
 
                 if ($result) {
                     // Оповещаем администратора о новом заказе                
-                    $adminEmail = 'php.start@mail.ru';
+                    $adminEmail = 'vitaliy.kurganskiy@yandex.ru';
                     $message = 'http://digital-mafia.net/admin/orders';
                     $subject = 'Новый заказ!';
                     mail($adminEmail, $subject, $message);
