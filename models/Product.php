@@ -156,4 +156,149 @@ class Product
         return $productsList;
     }
 
+    /**
+    * Возвращает список товаров
+    * @return array <p>Массив с товарами</p>
+    */
+    public static function getProductsList()
+    {
+        $db = Db::getConnection();
+
+        //Получаем и возвращаем результат
+        $result = $db->query('SELECT id, name, price, code FROM product ORDER BY id ASC');
+
+        $productsList = array();
+        $i = 0;
+        while ($row = $result->fetch()) {
+            $productsList[$i]['id'] = $row['id'];
+            $productsList[$i]['name'] = $row['name'];
+            $productsList[$i]['price'] = $row['price'];
+            $productsList[$i]['code'] = $row['code'];
+            $i++;
+        }
+        return $productsList;
+    }
+
+    /**
+    * Удаляет товар с указаным id
+    * @param integer $id <p>id товара</p>
+    * @return bolean <p>Результат выполнения метода</p>
+    */
+    public static function deleteProductById($id)
+    {
+        // Соединение с БД
+        $db = Db::getConnection();
+
+        // Текст запроса к БД
+        $sql = 'DELETE FROM product WHERE id = :id';
+
+        // Получение и возврат результатов. Используется подготовленный запрос
+        $result = $db->prepare($sql);
+        $result->bindParam(':id', $id, PDO::PARAM_INT);
+        return $result->execute();
+    }
+
+    /**
+    * Добавить новый товар
+    * @param array $option - массив с информацией о товаре
+    * @return intenger - id добавленной в таблицу записи
+    */
+    public static function createProduct($options)
+    {
+        // Соединение с БД
+        $db = Db::getConnection();
+
+        // Текст запроса к БД
+        $sql = 'INSERT INTO product '
+                . '(name, code, price, category_id, brand, availability,'
+                . 'description, is_new, is_recommended, status)'
+                . 'VALUES '
+                . '(:name, :code, :price, :category_id, :brand, :availability,'
+                . ':description, :is_new, :is_recommended, :status)';
+
+        // Получение и возврат результатов, используется подготовительный запрос
+        $result = $db->prepare($sql);
+        $result->bindParam(':name', $options['name'], PDO::PARAM_STR);
+        $result->bindParam(':code', $options['code'], PDO::PARAM_STR);
+        $result->bindParam(':price', $options['price'], PDO::PARAM_STR);
+        $result->bindParam(':category_id', $options['category_id'], PDO::PARAM_INT);
+        $result->bindParam(':brand', $options['brand'], PDO::PARAM_STR);
+        $result->bindParam(':availability', $options['availability'], PDO::PARAM_INT);
+        $result->bindParam(':description', $options['description'], PDO::PARAM_STR);
+        $result->bindParam(':is_new', $options['is_new'], PDO::PARAM_INT);
+        $result->bindParam(':is_recommended', $options['is_recommended'], PDO::PARAM_INT);
+        $result->bindParam(':status', $options['status'], PDO::PARAM_INT);
+        if($result->execute()) {
+            // Если запрос выполнен успешно, возвращаем ID добавленной записи
+            return $db->lastInsertId();
+        }
+        // Иначе возвращаем 0
+        return 0;
+    }
+
+    /**
+    * Редактирует товар с заданным ID
+    */
+    public static function updateProductById($id, $options)
+    {
+        //Соеденение с БД
+        $db = Db::getConnection();
+
+        // Текст запроса к БД
+        $sql = "UPDATE product 
+            SET
+                name = :name,
+                code = :code,
+                price = :price,
+                category_id = :category_id,
+                brand = :brand,
+                availability = :availability,
+                description = :description,
+                is_new = :is_new,
+                is_recommended = :is_recommended,
+                status = :status
+            WHERE id = :id";
+
+        // Получение и возврат результатов, используется подготовительный запрос
+        $result = $db->prepare($sql);
+        $result->bindParam(':id', $id, PDO::PARAM_INT);
+        $result->bindParam(':name', $options['name'], PDO::PARAM_STR);
+        $result->bindParam(':code', $options['code'], PDO::PARAM_STR);
+        $result->bindParam(':price', $options['price'], PDO::PARAM_STR);
+        $result->bindParam(':category_id', $options['category_id'], PDO::PARAM_INT);
+        $result->bindParam(':brand', $options['brand'], PDO::PARAM_STR);
+        $result->bindParam(':availability', $options['availability'], PDO::PARAM_INT);
+        $result->bindParam(':description', $options['description'], PDO::PARAM_STR);
+        $result->bindParam(':is_new', $options['is_new'], PDO::PARAM_INT);
+        $result->bindParam(':is_recommended', $options['is_recommended'], PDO::PARAM_INT);
+        $result->bindParam(':status', $options['status'], PDO::PARAM_INT);
+        return $result->execute();
+    }
+
+    /**
+     * Возвращает путь к изображению
+     * @param integer $id
+     * @return string <p>Путь к изображению</p>
+     */
+    public static function getImage($id)
+    {
+        // Название изображения-пустышки
+        $noImage = 'no-image.jpg';
+
+        // Путь к папке с товарами
+        $path = '/upload/images/products/';
+
+        // Путь к изображению товара
+        $pathToProductImage = $path . $id . '.jpg';
+
+        if (file_exists($_SERVER['DOCUMENT_ROOT'].$pathToProductImage)) {
+            // Если изображение для товара существует
+            // Возвращаем путь изображения товара
+            return $pathToProductImage;
+        }
+
+        // Возвращаем путь изображения-пустышки
+        return $path . $noImage;
+    }
+
 }

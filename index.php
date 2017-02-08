@@ -11,7 +11,7 @@ session_start();
 // 2. Подключение файлов системы
 define('ROOT', dirname(__FILE__));
 // Файл для авто-подключения
-require_once(ROOT.'/components/autoload.php');
+require_once(ROOT.'/components/Autoload.php');
 
 //require_once(ROOT.'/components/Router.php');
 
